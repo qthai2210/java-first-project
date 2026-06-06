@@ -95,8 +95,8 @@ javaFirstProject/
 │       ├── service/
 │       │   └── UserService.java               # Use Case implementation
 │       └── dto/
-           ├── UserRequestDto.java
-           └── UserResponseDto.java
+│           ├── UserRequestDto.java
+│           └── UserResponseDto.java
 └── infrastructure/
     ├── pom.xml
     └── src/main/java/com/example/infrastructure/

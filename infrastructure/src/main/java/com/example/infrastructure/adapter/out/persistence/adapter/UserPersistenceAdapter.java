@@ -36,6 +36,12 @@ public class UserPersistenceAdapter implements UserPersistencePort {
     }
 
     @Override
+    public Optional<User> findByEmail(String email) {
+        return userJpaRepository.findByEmail(email)
+                .map(userMapper::mapToDomain);
+    }
+
+    @Override
     public List<User> findAll() {
         return userJpaRepository.findAll().stream()
                 .map(userMapper::mapToDomain)
@@ -57,3 +63,4 @@ public class UserPersistenceAdapter implements UserPersistencePort {
         return userJpaRepository.existsByEmail(email);
     }
 }
+
