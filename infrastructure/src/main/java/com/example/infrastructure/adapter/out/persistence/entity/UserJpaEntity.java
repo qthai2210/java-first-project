@@ -40,7 +40,7 @@ public class UserJpaEntity {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'USER'")
     private Role role;
 
     @Column(name = "created_at", nullable = false, updatable = false)

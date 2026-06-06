@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/clean_architecture}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgrespassword}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# Development JWT secret key fallback
+app:
+  jwt:
+    secret: ${JWT_SECRET:development_jwt_secret_key_must_be_at_least_32_bytes_long_for_signing}
+
+logging:
+  level:
+    root: INFO
+    com.example: DEBUG
+

@@ -1,5 +1,6 @@
 package com.example.infrastructure.config;
 
+import com.example.infrastructure.filter.RequestResponseLoggingFilter;
 import com.example.infrastructure.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,11 +34,14 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
+    private final RequestResponseLoggingFilter loggingFilter;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter,
-                          UserDetailsService userDetailsService) {
+                          UserDetailsService userDetailsService,
+                          RequestResponseLoggingFilter loggingFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.userDetailsService = userDetailsService;
+        this.loggingFilter = loggingFilter;
     }
 
     @Bean
@@ -66,6 +70,7 @@ public class SecurityConfig {
 
                 // Register our JWT filter before the standard username/password filter
                 .authenticationProvider(authenticationProvider())
+                .addFilterBefore(loggingFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

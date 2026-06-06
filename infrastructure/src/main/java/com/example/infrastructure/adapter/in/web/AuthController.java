@@ -7,6 +7,7 @@ import com.example.application.port.in.AuthServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Public authentication endpoints — no JWT token required.
  * These are whitelisted in SecurityConfig.
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Authentication", description = "Public endpoints for user registration and login")
@@ -31,12 +33,18 @@ public class AuthController {
     @PostMapping("/register")
     @Operation(summary = "Register a new user account", description = "Creates a new user with role USER and returns a JWT token")
     public ResponseEntity<AuthResponseDto> register(@Valid @RequestBody UserRequestDto request) {
-        return ResponseEntity.ok(authServicePort.register(request));
+        log.info("Request to register new user with email: {}", request.getEmail());
+        AuthResponseDto response = authServicePort.register(request);
+        log.info("User registered successfully: {}", request.getEmail());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
     @Operation(summary = "Login with email and password", description = "Authenticates user credentials and returns a JWT token")
     public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody AuthRequestDto request) {
-        return ResponseEntity.ok(authServicePort.login(request));
+        log.info("Login attempt for email: {}", request.getEmail());
+        AuthResponseDto response = authServicePort.login(request);
+        log.info("Login successful for email: {}", request.getEmail());
+        return ResponseEntity.ok(response);
     }
 }

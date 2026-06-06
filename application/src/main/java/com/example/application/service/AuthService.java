@@ -11,7 +11,6 @@ import com.example.domain.exception.DomainException;
 import com.example.domain.exception.ResourceNotFoundException;
 import com.example.domain.model.Role;
 import com.example.domain.model.User;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
@@ -19,7 +18,6 @@ import java.time.LocalDateTime;
  * Application service implementing authentication use cases.
  * Has no dependency on Spring Security or JJWT — only uses ports.
  */
-@Service
 public class AuthService implements AuthServicePort {
 
     private final UserPersistencePort userPersistencePort;

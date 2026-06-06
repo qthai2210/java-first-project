@@ -1,0 +1,35 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+# Production JWT secret key (must be provided via environment variables, otherwise fails startup)
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+
+logging:
+  level:
+    root: INFO
+    com.example: INFO
+  structured:
+    format:
+      console: logstash
+      file: logstash
+  file:
+    name: logs/app.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+      total-size-cap: 3GB
+
