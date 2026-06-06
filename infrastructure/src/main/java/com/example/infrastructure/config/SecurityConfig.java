@@ -64,6 +64,9 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/v3/api-docs"
                         ).permitAll()
+                        // Actuator health endpoint — public for load balancers
+                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/actuator/**").authenticated()
                         // Everything else requires authentication
                         .anyRequest().authenticated()
                 )

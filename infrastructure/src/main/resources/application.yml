@@ -38,3 +38,24 @@ app:
     expiration-ms: 86400000
     # Refresh Token expiration: 7 days in milliseconds (604800000 ms)
     refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,flyway
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true
+
+# Application Info (exposed via /actuator/info)
+info:
+  app:
+    name: Clean Architecture Demo
+    description: Spring Boot REST API with Clean Architecture
+    version: 0.0.1-SNAPSHOT
