@@ -36,3 +36,5 @@ app:
   jwt:
     # Token expiration: 24 hours in milliseconds (common to all profiles)
     expiration-ms: 86400000
+    # Refresh Token expiration: 7 days in milliseconds (604800000 ms)
+    refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}

@@ -1,25 +1,19 @@
 package com.example.application.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * DTO returned after a successful authentication (login or register).
- */
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthResponseDto {
+public class TokenRefreshRequestDto {
 
-    private String accessToken;
-
+    @NotBlank(message = "Refresh token is required")
     private String refreshToken;
-
-    @Builder.Default
-    private String tokenType = "Bearer";
 }

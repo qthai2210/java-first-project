@@ -1,0 +1,11 @@
+{
+  "name": "java-first-project",
+  "version": "1.0.0",
+  "description": "Helper scripts for Spring Boot Clean Architecture project",
+  "scripts": {
+    "dev": "mvn spring-boot:run -pl infrastructure",
+    "elk": "docker-compose up -d",
+    "elk:down": "docker-compose down",
+    "build": "mvn clean install -DskipTests"
+  }
+}

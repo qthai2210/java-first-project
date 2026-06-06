@@ -24,4 +24,12 @@ public interface AuthServicePort {
      * @return an AuthResponseDto containing the JWT access token
      */
     AuthResponseDto login(AuthRequestDto request);
+
+    /**
+     * Refreshes the access token using a valid refresh token.
+     *
+     * @param refreshToken the refresh token string
+     * @return a new AuthResponseDto containing a new access token and refresh token
+     */
+    AuthResponseDto refreshToken(String refreshToken);
 }

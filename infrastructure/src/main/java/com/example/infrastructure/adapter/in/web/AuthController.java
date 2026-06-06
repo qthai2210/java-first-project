@@ -2,6 +2,7 @@ package com.example.infrastructure.adapter.in.web;
 
 import com.example.application.dto.AuthRequestDto;
 import com.example.application.dto.AuthResponseDto;
+import com.example.application.dto.TokenRefreshRequestDto;
 import com.example.application.dto.UserRequestDto;
 import com.example.application.port.in.AuthServicePort;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,6 +46,15 @@ public class AuthController {
         log.info("Login attempt for email: {}", request.getEmail());
         AuthResponseDto response = authServicePort.login(request);
         log.info("Login successful for email: {}", request.getEmail());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/refresh")
+    @Operation(summary = "Refresh access token", description = "Uses a refresh token to generate a new access token and a new refresh token (rotation)")
+    public ResponseEntity<AuthResponseDto> refresh(@Valid @RequestBody TokenRefreshRequestDto request) {
+        log.info("Refresh token request initiated");
+        AuthResponseDto response = authServicePort.refreshToken(request.getRefreshToken());
+        log.info("Token refreshed successfully");
         return ResponseEntity.ok(response);
     }
 }
