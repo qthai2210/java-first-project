@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import com.example.infrastructure.mapper.UserMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,41 +28,43 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserServicePort userServicePort;
+    private final UserMapper userMapper;
 
-    public UserController(UserServicePort userServicePort) {
+    public UserController(UserServicePort userServicePort, UserMapper userMapper) {
         this.userServicePort = userServicePort;
+        this.userMapper = userMapper;
     }
 
     @PostMapping
     @Operation(summary = "Create a new user")
-    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto request) {
-        User userDomain = mapToDomain(request);
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto request) {
+        User userDomain = userMapper.mapToDomain(request);
         User createdUser = userServicePort.createUser(userDomain);
-        return new ResponseEntity<>(mapToDto(createdUser), HttpStatus.CREATED);
+        return new ResponseEntity<>(userMapper.mapToDto(createdUser), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get a user by ID")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
         User user = userServicePort.getUserById(id);
-        return ResponseEntity.ok(mapToDto(user));
+        return ResponseEntity.ok(userMapper.mapToDto(user));
     }
 
     @GetMapping
     @Operation(summary = "Get all users")
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {
         List<UserResponseDto> users = userServicePort.getAllUsers().stream()
-                .map(this::mapToDto)
+                .map(userMapper::mapToDto)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(users);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a user's details")
-    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @RequestBody UserRequestDto request) {
-        User userDetails = mapToDomain(request);
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserRequestDto request) {
+        User userDetails = userMapper.mapToDomain(request);
         User updatedUser = userServicePort.updateUser(id, userDetails);
-        return ResponseEntity.ok(mapToDto(updatedUser));
+        return ResponseEntity.ok(userMapper.mapToDto(updatedUser));
     }
 
     @DeleteMapping("/{id}")
@@ -68,21 +72,5 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userServicePort.deleteUser(id);
         return ResponseEntity.noContent().build();
-    }
-
-    private User mapToDomain(UserRequestDto dto) {
-        return User.builder()
-                .name(dto.getName())
-                .email(dto.getEmail())
-                .build();
-    }
-
-    private UserResponseDto mapToDto(User domain) {
-        return UserResponseDto.builder()
-                .id(domain.getId())
-                .name(domain.getName())
-                .email(domain.getEmail())
-                .createdAt(domain.getCreatedAt())
-                .build();
     }
 }

@@ -5,6 +5,7 @@ import com.example.domain.model.User;
 import com.example.infrastructure.adapter.out.persistence.entity.UserJpaEntity;
 import com.example.infrastructure.adapter.out.persistence.repository.UserJpaRepository;
 import org.springframework.stereotype.Component;
+import com.example.infrastructure.mapper.UserMapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,28 +15,30 @@ import java.util.stream.Collectors;
 public class UserPersistenceAdapter implements UserPersistencePort {
 
     private final UserJpaRepository userJpaRepository;
+    private final UserMapper userMapper;
 
-    public UserPersistenceAdapter(UserJpaRepository userJpaRepository) {
+    public UserPersistenceAdapter(UserJpaRepository userJpaRepository, UserMapper userMapper) {
         this.userJpaRepository = userJpaRepository;
+        this.userMapper = userMapper;
     }
 
     @Override
     public User save(User user) {
-        UserJpaEntity entity = mapToJpaEntity(user);
+        UserJpaEntity entity = userMapper.mapToJpaEntity(user);
         UserJpaEntity savedEntity = userJpaRepository.save(entity);
-        return mapToDomain(savedEntity);
+        return userMapper.mapToDomain(savedEntity);
     }
 
     @Override
     public Optional<User> findById(Long id) {
         return userJpaRepository.findById(id)
-                .map(this::mapToDomain);
+                .map(userMapper::mapToDomain);
     }
 
     @Override
     public List<User> findAll() {
         return userJpaRepository.findAll().stream()
-                .map(this::mapToDomain)
+                .map(userMapper::mapToDomain)
                 .collect(Collectors.toList());
     }
 
@@ -52,23 +55,5 @@ public class UserPersistenceAdapter implements UserPersistencePort {
     @Override
     public boolean existsByEmail(String email) {
         return userJpaRepository.existsByEmail(email);
-    }
-
-    private UserJpaEntity mapToJpaEntity(User domain) {
-        return UserJpaEntity.builder()
-                .id(domain.getId())
-                .name(domain.getName())
-                .email(domain.getEmail())
-                .createdAt(domain.getCreatedAt())
-                .build();
-    }
-
-    private User mapToDomain(UserJpaEntity entity) {
-        return User.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .email(entity.getEmail())
-                .createdAt(entity.getCreatedAt())
-                .build();
     }
 }
