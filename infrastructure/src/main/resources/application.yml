@@ -59,3 +59,11 @@ info:
     name: Clean Architecture Demo
     description: Spring Boot REST API with Clean Architecture
     version: 0.0.1-SNAPSHOT
+
+# Rate Limiting Configuration
+app:
+  rate-limit:
+    enabled: true
+    capacity: 20
+    refill-tokens: 20
+    duration-seconds: 60

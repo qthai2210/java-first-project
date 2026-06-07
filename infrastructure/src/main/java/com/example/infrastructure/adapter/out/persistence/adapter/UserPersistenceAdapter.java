@@ -1,9 +1,16 @@
 package com.example.infrastructure.adapter.out.persistence.adapter;
 
 import com.example.application.port.out.UserPersistencePort;
+import com.example.application.dto.PageDataDto;
+import com.example.application.dto.PageQueryDto;
 import com.example.domain.model.User;
 import com.example.infrastructure.adapter.out.persistence.entity.UserJpaEntity;
 import com.example.infrastructure.adapter.out.persistence.repository.UserJpaRepository;
+import com.example.infrastructure.mapper.PaginationMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import com.example.infrastructure.mapper.UserMapper;
 
@@ -42,10 +49,11 @@ public class UserPersistenceAdapter implements UserPersistencePort {
     }
 
     @Override
-    public List<User> findAll() {
-        return userJpaRepository.findAll().stream()
-                .map(userMapper::mapToDomain)
-                .collect(Collectors.toList());
+    public PageDataDto<User> findAll(PageQueryDto query) {
+        Sort.Direction direction = Sort.Direction.fromString(query.getSortDirection());
+        Pageable pageable = PageRequest.of(query.getPage(), query.getSize(), Sort.by(direction, query.getSortBy()));
+        Page<UserJpaEntity> page = userJpaRepository.findAll(pageable);
+        return PaginationMapper.map(page, userMapper::mapToDomain);
     }
 
     @Override
@@ -63,4 +71,3 @@ public class UserPersistenceAdapter implements UserPersistencePort {
         return userJpaRepository.existsByEmail(email);
     }
 }
-

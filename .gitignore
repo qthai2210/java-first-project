@@ -26,3 +26,6 @@ Thumbs.db
 logs/
 *.log
 
+# Repomix AI Context Files
+repomix.xml
+repomix-output.xml

@@ -6,6 +6,8 @@ import com.example.application.port.out.UserPersistencePort;
 import com.example.domain.exception.DomainException;
 import com.example.domain.exception.ResourceNotFoundException;
 import com.example.domain.model.Role;
+import com.example.application.dto.PageDataDto;
+import com.example.application.dto.PageQueryDto;
 import com.example.domain.model.User;
 
 import lombok.extern.slf4j.Slf4j;
@@ -57,9 +59,9 @@ public class UserService implements UserServicePort {
     }
 
     @Override
-    public List<User> getAllUsers() {
-        log.debug("Fetching all users list");
-        return userPersistencePort.findAll();
+    public PageDataDto<User> getAllUsers(PageQueryDto query) {
+        log.debug("Fetching all users list with page {} size {}", query.getPage(), query.getSize());
+        return userPersistencePort.findAll(query);
     }
 
     @Override

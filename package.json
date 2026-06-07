@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "Helper scripts for Spring Boot Clean Architecture project",
   "scripts": {
-    "dev": "mvn spring-boot:run -pl infrastructure",
+    "dev": "mvn clean install -DskipTests && java -jar infrastructure/target/infrastructure-0.0.1-SNAPSHOT.jar",
     "elk": "docker-compose up -d",
     "elk:down": "docker-compose down",
-    "build": "mvn clean install -DskipTests"
+    "build": "mvn clean install -DskipTests",
+    "repomix": "npx repomix"
   }
 }

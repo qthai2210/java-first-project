@@ -19,8 +19,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.infrastructure.mapper.UserMapper;
+import com.example.application.dto.PageDataDto;
+import com.example.application.dto.PageQueryDto;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,13 +66,31 @@ public class UserController {
     @GetMapping
     @Operation(summary = "Get all users (Admin only)")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
-        log.info("REST request to retrieve all users list");
-        List<UserResponseDto> users = userServicePort.getAllUsers().stream()
+    public ResponseEntity<PageDataDto<UserResponseDto>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+        log.info("REST request to retrieve all users list, page: {}, size: {}", page, size);
+        PageQueryDto query = new PageQueryDto(page, size, sortBy, sortDirection);
+        PageDataDto<User> userPageData = userServicePort.getAllUsers(query);
+        
+        List<UserResponseDto> dtoList = userPageData.getData().stream()
                 .map(userMapper::mapToDto)
                 .collect(Collectors.toList());
-        log.info("Retrieved {} users", users.size());
-        return ResponseEntity.ok(users);
+        
+        PageDataDto<UserResponseDto> responseData = new PageDataDto<>(
+                dtoList,
+                userPageData.getPage(),
+                userPageData.getSize(),
+                userPageData.getTotalElements(),
+                userPageData.getTotalPages(),
+                userPageData.isHasNext(),
+                userPageData.isHasPrevious()
+        );
+        
+        log.info("Retrieved {} users", dtoList.size());
+        return ResponseEntity.ok(responseData);
     }
 
     @PutMapping("/{id}")
@@ -93,4 +114,3 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 }
-
