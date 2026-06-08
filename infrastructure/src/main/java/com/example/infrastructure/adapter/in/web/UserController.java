@@ -4,6 +4,7 @@ import com.example.application.dto.UserRequestDto;
 import com.example.application.dto.UserResponseDto;
 import com.example.application.port.in.UserServicePort;
 import com.example.domain.model.User;
+import com.example.infrastructure.security.UserSecurity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,10 +38,12 @@ public class UserController {
 
     private final UserServicePort userServicePort;
     private final UserMapper userMapper;
+    private final UserSecurity userSecurity;
 
-    public UserController(UserServicePort userServicePort, UserMapper userMapper) {
+    public UserController(UserServicePort userServicePort, UserMapper userMapper, UserSecurity userSecurity) {
         this.userServicePort = userServicePort;
         this.userMapper = userMapper;
+        this.userSecurity = userSecurity;
     }
 
     @PostMapping
@@ -56,7 +59,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get a user by ID")
-    @PreAuthorize("hasRole('ADMIN') or authentication.name == @userServicePort.getUserById(#id).email")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isOwner(#id)")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
         log.info("REST request to get user by ID: {}", id);
         User user = userServicePort.getUserById(id);
@@ -95,7 +98,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a user's details")
-    @PreAuthorize("hasRole('ADMIN') or authentication.name == @userServicePort.getUserById(#id).email")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isOwner(#id)")
     public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserRequestDto request) {
         log.info("REST request to update user with ID: {}", id);
         User userDetails = userMapper.mapToDomain(request);

@@ -9,14 +9,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * JWT authentication filter that runs once per request.
@@ -30,14 +31,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtServicePort jwtServicePort;
-    private final UserDetailsService userDetailsService;
     private final UserPersistencePort userPersistencePort;
 
     public JwtAuthenticationFilter(JwtServicePort jwtServicePort,
-                                   UserDetailsService userDetailsService,
                                    UserPersistencePort userPersistencePort) {
         this.jwtServicePort = jwtServicePort;
-        this.userDetailsService = userDetailsService;
         this.userPersistencePort = userPersistencePort;
     }
 
@@ -68,10 +66,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Only set auth if user is not already authenticated
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
             User user = userPersistencePort.findByEmail(userEmail).orElse(null);
 
             if (user != null && jwtServicePort.isTokenValid(jwt, user)) {
+                UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
+                        .username(user.getEmail())
+                        .password(user.getPassword())
+                        .authorities(List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())))
+                        .build();
+
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,

@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -28,6 +30,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
+@EnableScheduling
 public class RateLimitingFilter extends OncePerRequestFilter {
 
     private final boolean enabled;
@@ -35,6 +38,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     private final int refillTokens;
     private final int durationSeconds;
     private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
+    private final Map<String, Instant> lastAccess = new ConcurrentHashMap<>();
 
     public RateLimitingFilter(
             @Value("${app.rate-limit.enabled:true}") boolean enabled,
@@ -68,6 +72,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
         String clientKey = resolveClientKey(request);
         Bucket bucket = cache.computeIfAbsent(clientKey, key -> createNewBucket());
+        lastAccess.put(clientKey, Instant.now());
 
         if (bucket.tryConsume(1)) {
             response.addHeader("X-Rate-Limit-Limit", String.valueOf(capacity));
@@ -119,5 +124,18 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             ip = ip.split(",")[0].trim();
         }
         return "ip:" + ip;
+    }
+
+    @Scheduled(fixedDelay = 300000)
+    public void cleanupStaleEntries() {
+        Instant threshold = Instant.now().minusSeconds(durationSeconds * 2L);
+        lastAccess.entrySet().removeIf(entry -> {
+            if (entry.getValue().isBefore(threshold)) {
+                cache.remove(entry.getKey());
+                return true;
+            }
+            return false;
+        });
+        log.debug("Rate limit cache cleaned up. Current size: {}", cache.size());
     }
 }

@@ -38,6 +38,11 @@ app:
     expiration-ms: 86400000
     # Refresh Token expiration: 7 days in milliseconds (604800000 ms)
     refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}
+  rate-limit:
+    enabled: true
+    capacity: 20
+    refill-tokens: 20
+    duration-seconds: 60
 
 # Actuator Configuration
 management:
@@ -59,11 +64,3 @@ info:
     name: Clean Architecture Demo
     description: Spring Boot REST API with Clean Architecture
     version: 0.0.1-SNAPSHOT
-
-# Rate Limiting Configuration
-app:
-  rate-limit:
-    enabled: true
-    capacity: 20
-    refill-tokens: 20
-    duration-seconds: 60

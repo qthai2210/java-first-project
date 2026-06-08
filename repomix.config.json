@@ -1,0 +1,17 @@
+{
+  "output": {
+    "filePath": "repomix.xml",
+    "style": "xml",
+    "instructionFilePath": ".cursor/rules/karpathy-guidelines.mdc"
+  },
+  "ignore": {
+    "useGitignore": true,
+    "customPatterns": [
+      "target/",
+      ".vscode/",
+      ".idea/",
+      "*.class",
+      "repomix.xml"
+    ]
+  }
+}
