@@ -5,6 +5,8 @@ import com.example.domain.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.util.function.Function;
  * JWT implementation using the JJWT library.
  * Lives in Infrastructure — the Application layer only sees JwtServicePort.
  */
+@Slf4j
 @Service
 public class JwtService implements JwtServicePort {
 
@@ -25,6 +28,26 @@ public class JwtService implements JwtServicePort {
 
     @Value("${app.jwt.expiration-ms}")
     private long expirationMs;
+
+    @PostConstruct
+    public void validateSecretKeyStrength() {
+        if (secretKey == null || secretKey.isBlank()) {
+            throw new IllegalStateException("JWT secret key (app.jwt.secret) must not be empty or null.");
+        }
+        
+        int secretLength = secretKey.getBytes(StandardCharsets.UTF_8).length;
+        if (secretLength < 32) {
+            throw new IllegalStateException(
+                "JWT secret key is too weak! It must be at least 32 bytes (256 bits) long. " +
+                "Current length: " + secretLength + " bytes. Update the JWT_SECRET environment variable."
+            );
+        }
+
+        if (secretKey.contains("development") || secretKey.contains("default") || secretKey.contains("test")) {
+            log.warn("⚠️ SECURITY WARNING: You are using a default/development JWT secret key. " +
+                     "Ensure the JWT_SECRET environment variable is securely set in production!");
+        }
+    }
 
     @Override
     public String generateToken(User user) {

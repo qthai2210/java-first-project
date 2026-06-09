@@ -34,16 +34,18 @@ public class UserService implements UserServicePort {
             throw new DomainException("Email '" + user.getEmail() + "' is already in use");
         }
         
-        if (user.getRole() == null) {
-            user.setRole(Role.USER);
-        }
+        Role role = user.getRole() != null ? user.getRole() : Role.USER;
+        String encodedPassword = user.getPassword() != null ? passwordEncoderPort.encode(user.getPassword()) : null;
         
-        if (user.getPassword() != null) {
-            user.setPassword(passwordEncoderPort.encode(user.getPassword()));
-        }
-        
-        user.setCreatedAt(LocalDateTime.now());
-        User savedUser = userPersistencePort.save(user);
+        User userToSave = User.builder()
+                .name(user.getName())
+                .email(user.getEmail())
+                .password(encodedPassword)
+                .role(role)
+                .createdAt(LocalDateTime.now())
+                .build();
+                
+        User savedUser = userPersistencePort.save(userToSave);
         log.info("User registered successfully in database with ID: {}", savedUser.getId());
         return savedUser;
     }
@@ -75,18 +77,19 @@ public class UserService implements UserServicePort {
             throw new DomainException("Email '" + userDetails.getEmail() + "' is already in use");
         }
 
-        existingUser.setName(userDetails.getName());
-        existingUser.setEmail(userDetails.getEmail());
+        User.UserBuilder userBuilder = existingUser.toBuilder()
+                .name(userDetails.getName())
+                .email(userDetails.getEmail());
         
         if (userDetails.getPassword() != null && !userDetails.getPassword().isBlank()) {
-            existingUser.setPassword(passwordEncoderPort.encode(userDetails.getPassword()));
+            userBuilder.password(passwordEncoderPort.encode(userDetails.getPassword()));
         }
         
         if (userDetails.getRole() != null) {
-            existingUser.setRole(userDetails.getRole());
+            userBuilder.role(userDetails.getRole());
         }
 
-        User updatedUser = userPersistencePort.save(existingUser);
+        User updatedUser = userPersistencePort.save(userBuilder.build());
         log.info("User with ID: {} updated successfully in database", id);
         return updatedUser;
     }
