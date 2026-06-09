@@ -27,6 +27,13 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
+        <!-- Spring Transaction Annotation Support -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- JUnit for tests -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
