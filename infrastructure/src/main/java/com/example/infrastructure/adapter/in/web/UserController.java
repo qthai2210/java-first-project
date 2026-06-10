@@ -46,6 +46,15 @@ public class UserController {
         this.userSecurity = userSecurity;
     }
 
+    @GetMapping("/me")
+    @Operation(summary = "Get current authenticated user profile")
+    public ResponseEntity<UserResponseDto> getCurrentUser() {
+        String email = userSecurity.getCurrentUserEmail();
+        log.info("REST request to get current user profile for email: {}", email);
+        User user = userServicePort.getUserByEmail(email);
+        return ResponseEntity.ok(userMapper.mapToDto(user));
+    }
+
     @PostMapping
     @Operation(summary = "Create a new user (Admin only)")
     @PreAuthorize("hasRole('ADMIN')")

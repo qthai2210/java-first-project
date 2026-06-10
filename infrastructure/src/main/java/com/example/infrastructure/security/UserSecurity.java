@@ -15,6 +15,14 @@ public class UserSecurity {
         this.userPersistencePort = userPersistencePort;
     }
 
+    public String getCurrentUserEmail() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+            throw new RuntimeException("No authenticated user found");
+        }
+        return auth.getName();
+    }
+
     public boolean isOwner(Long userId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {

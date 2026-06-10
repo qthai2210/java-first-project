@@ -31,7 +31,7 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-# Common JWT configuration
+# Custom App Configuration
 app:
   jwt:
     # Token expiration: 24 hours in milliseconds (common to all profiles)
@@ -43,6 +43,13 @@ app:
     capacity: 20
     refill-tokens: 20
     duration-seconds: 60
+  seed:
+    admin:
+      email: ${SEED_ADMIN_EMAIL:admin@stockai.com}
+      password: ${SEED_ADMIN_PASSWORD:Admin123!}
+    demo:
+      email: ${SEED_DEMO_EMAIL:demo@stockai.com}
+      password: ${SEED_DEMO_PASSWORD:Demo123!}
 
 # Actuator Configuration
 management:

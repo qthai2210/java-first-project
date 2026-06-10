@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Slf4j
 public class UserService implements UserServicePort {
@@ -32,8 +31,8 @@ public class UserService implements UserServicePort {
     public User createUser(User user) {
         log.debug("Creating user with email: {}", user.getEmail());
         if (userPersistencePort.existsByEmail(user.getEmail())) {
-            log.warn("Email registration failed: '{}' is already in use", user.getEmail());
-            throw new DomainException("Email '" + user.getEmail() + "' is already in use");
+            log.warn("Email registration failed: '\''{}'\'' is already in use", user.getEmail());
+            throw new DomainException("Email '\''" + user.getEmail() + "'\'' is already in use");
         }
         
         Role role = user.getRole() != null ? user.getRole() : Role.USER;
@@ -65,6 +64,17 @@ public class UserService implements UserServicePort {
 
     @Override
     @Transactional(readOnly = true)
+    public User getUserByEmail(String email) {
+        log.debug("Fetching user by email: {}", email);
+        return userPersistencePort.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.warn("User with email: {} not found", email);
+                    return new ResourceNotFoundException("User with email " + email + " not found");
+                });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public PageDataDto<User> getAllUsers(PageQueryDto query) {
         log.debug("Fetching all users list with page {} size {}", query.getPage(), query.getSize());
         return userPersistencePort.findAll(query);
@@ -78,8 +88,8 @@ public class UserService implements UserServicePort {
 
         if (!existingUser.getEmail().equals(userDetails.getEmail()) 
                 && userPersistencePort.existsByEmail(userDetails.getEmail())) {
-            log.warn("Failed to update user ID: {}: Email '{}' is already in use", id, userDetails.getEmail());
-            throw new DomainException("Email '" + userDetails.getEmail() + "' is already in use");
+            log.warn("Failed to update user ID: {}: Email '\''{}'\'' is already in use", id, userDetails.getEmail());
+            throw new DomainException("Email '\''" + userDetails.getEmail() + "'\'' is already in use");
         }
 
         User.UserBuilder userBuilder = existingUser.toBuilder()
