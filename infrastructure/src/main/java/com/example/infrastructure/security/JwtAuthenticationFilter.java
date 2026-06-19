@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             userEmail = jwtServicePort.extractEmail(jwt);
         } catch (Exception e) {
-            // Invalid token format — let Spring Security handle it as 401
+            // Invalid token format — let Spring Security handle it as UNAUTHORIZED
             filterChain.doFilter(request, response);
             return;
         }
