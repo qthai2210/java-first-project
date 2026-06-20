@@ -1,5 +1,7 @@
 package com.example.infrastructure.adapter.in.web;
 
+import com.example.application.command.CreateAlertCommand;
+import com.example.application.command.UpdateAlertCommand;
 import com.example.application.dto.AlertRequestDto;
 import com.example.application.dto.AlertResponseDto;
 import com.example.application.port.in.AlertServicePort;
@@ -43,7 +45,13 @@ public class AlertController {
     public ResponseEntity<AlertResponseDto> createAlert(@Valid @RequestBody AlertRequestDto request) {
         Long userId = userSecurity.getCurrentUserId();
         log.info("REST request to create alert for stock: {} and user ID: {}", request.getSymbol(), userId);
-        Alert created = alertServicePort.createAlert(userId, request);
+        CreateAlertCommand command = new CreateAlertCommand(
+                request.getSymbol(),
+                request.getConditionType(),
+                request.getComparisonOperator(),
+                request.getThresholdValue()
+        );
+        Alert created = alertServicePort.createAlert(userId, command);
         return new ResponseEntity<>(alertMapper.mapToDto(created), HttpStatus.CREATED);
     }
 
@@ -77,7 +85,13 @@ public class AlertController {
             @Valid @RequestBody AlertRequestDto request) {
         Long userId = userSecurity.getCurrentUserId();
         log.info("REST request to update alert: {} for user ID: {}", id, userId);
-        Alert updated = alertServicePort.updateAlert(userId, id, request);
+        UpdateAlertCommand command = new UpdateAlertCommand(
+                request.getSymbol(),
+                request.getConditionType(),
+                request.getComparisonOperator(),
+                request.getThresholdValue()
+        );
+        Alert updated = alertServicePort.updateAlert(userId, id, command);
         return ResponseEntity.ok(alertMapper.mapToDto(updated));
     }
 

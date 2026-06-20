@@ -1,6 +1,7 @@
 package com.example.application.service;
 
-import com.example.application.dto.AlertRequestDto;
+import com.example.application.command.CreateAlertCommand;
+import com.example.application.command.UpdateAlertCommand;
 import com.example.application.port.in.AlertServicePort;
 import com.example.application.port.out.AlertPersistencePort;
 import com.example.application.port.out.StockPersistencePort;
@@ -35,19 +36,19 @@ public class AlertService implements AlertServicePort {
 
     @Override
 
-    public Alert createAlert(Long userId, AlertRequestDto dto) {
-        log.debug("Creating alert for user ID: {} on stock: {}", userId, dto.getSymbol());
+    public Alert createAlert(Long userId, CreateAlertCommand command) {
+        log.debug("Creating alert for user ID: {} on stock: {}", userId, command.symbol());
         User user = userPersistencePort.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with ID " + userId + " not found"));
 
-        Stock stock = stockPersistencePort.findBySymbol(dto.getSymbol().toUpperCase())
-                .orElseThrow(() -> new ResourceNotFoundException("Stock with symbol " + dto.getSymbol() + " not found"));
+        Stock stock = stockPersistencePort.findBySymbol(command.symbol().toUpperCase())
+                .orElseThrow(() -> new ResourceNotFoundException("Stock with symbol " + command.symbol() + " not found"));
 
         AlertConditionType conditionType;
         ComparisonOperator comparisonOperator;
         try {
-            conditionType = AlertConditionType.valueOf(dto.getConditionType().toUpperCase());
-            comparisonOperator = ComparisonOperator.valueOf(dto.getComparisonOperator().toUpperCase());
+            conditionType = AlertConditionType.valueOf(command.conditionType().toUpperCase());
+            comparisonOperator = ComparisonOperator.valueOf(command.comparisonOperator().toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new DomainException("Invalid condition type or comparison operator");
         }
@@ -57,7 +58,7 @@ public class AlertService implements AlertServicePort {
                 .stock(stock)
                 .conditionType(conditionType)
                 .comparisonOperator(comparisonOperator)
-                .thresholdValue(dto.getThresholdValue())
+                .thresholdValue(command.thresholdValue())
                 .enabled(true)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -86,15 +87,15 @@ public class AlertService implements AlertServicePort {
 
     @Override
 
-    public Alert updateAlert(Long userId, Long alertId, AlertRequestDto dto) {
+    public Alert updateAlert(Long userId, Long alertId, UpdateAlertCommand command) {
         log.debug("Updating alert ID: {}", alertId);
         Alert alert = getAlertById(userId, alertId);
 
         AlertConditionType conditionType;
         ComparisonOperator comparisonOperator;
         try {
-            conditionType = AlertConditionType.valueOf(dto.getConditionType().toUpperCase());
-            comparisonOperator = ComparisonOperator.valueOf(dto.getComparisonOperator().toUpperCase());
+            conditionType = AlertConditionType.valueOf(command.conditionType().toUpperCase());
+            comparisonOperator = ComparisonOperator.valueOf(command.comparisonOperator().toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new DomainException("Invalid condition type or comparison operator");
         }
@@ -102,7 +103,7 @@ public class AlertService implements AlertServicePort {
         Alert updated = alert.toBuilder()
                 .conditionType(conditionType)
                 .comparisonOperator(comparisonOperator)
-                .thresholdValue(dto.getThresholdValue())
+                .thresholdValue(command.thresholdValue())
                 .build();
 
         return alertPersistencePort.save(updated);

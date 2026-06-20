@@ -1,6 +1,7 @@
 package com.example.infrastructure.decorator;
 
-import com.example.application.dto.WatchlistStockRequestDto;
+import com.example.application.command.AddWatchlistStockCommand;
+import com.example.application.command.UpdateWatchlistStockCommand;
 import com.example.application.port.in.WatchlistServicePort;
 import com.example.domain.model.Watchlist;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,8 +36,8 @@ public class TransactionalWatchlistServiceDecorator implements WatchlistServiceP
 
     @Override
     @Transactional
-    public Watchlist addStockToWatchlist(Long userId, Long watchlistId, WatchlistStockRequestDto dto) {
-        return delegate.addStockToWatchlist(userId, watchlistId, dto);
+    public Watchlist addStockToWatchlist(Long userId, Long watchlistId, AddWatchlistStockCommand command) {
+        return delegate.addStockToWatchlist(userId, watchlistId, command);
     }
 
     @Override
@@ -47,8 +48,8 @@ public class TransactionalWatchlistServiceDecorator implements WatchlistServiceP
 
     @Override
     @Transactional
-    public Watchlist updateWatchlistStock(Long userId, Long watchlistId, WatchlistStockRequestDto dto) {
-        return delegate.updateWatchlistStock(userId, watchlistId, dto);
+    public Watchlist updateWatchlistStock(Long userId, Long watchlistId, UpdateWatchlistStockCommand command) {
+        return delegate.updateWatchlistStock(userId, watchlistId, command);
     }
 
     @Override

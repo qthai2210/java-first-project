@@ -1,6 +1,7 @@
 package com.example.application.port.in;
 
-import com.example.application.dto.WatchlistStockRequestDto;
+import com.example.application.command.AddWatchlistStockCommand;
+import com.example.application.command.UpdateWatchlistStockCommand;
 import com.example.domain.model.Watchlist;
 
 import java.util.List;
@@ -12,11 +13,11 @@ public interface WatchlistServicePort {
 
     List<Watchlist> getUserWatchlists(Long userId);
 
-    Watchlist addStockToWatchlist(Long userId, Long watchlistId, WatchlistStockRequestDto dto);
+    Watchlist addStockToWatchlist(Long userId, Long watchlistId, AddWatchlistStockCommand command);
 
     Watchlist removeStockFromWatchlist(Long userId, Long watchlistId, String symbol);
 
-    Watchlist updateWatchlistStock(Long userId, Long watchlistId, WatchlistStockRequestDto dto);
+    Watchlist updateWatchlistStock(Long userId, Long watchlistId, UpdateWatchlistStockCommand command);
 
     void deleteWatchlist(Long userId, Long watchlistId);
 }

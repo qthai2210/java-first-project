@@ -1,5 +1,7 @@
 package com.example.infrastructure.adapter.in.web;
 
+import com.example.application.command.AddWatchlistStockCommand;
+import com.example.application.command.UpdateWatchlistStockCommand;
 import com.example.application.dto.WatchlistRequestDto;
 import com.example.application.dto.WatchlistResponseDto;
 import com.example.application.dto.WatchlistStockRequestDto;
@@ -92,7 +94,13 @@ public class WatchlistController {
             @Valid @RequestBody WatchlistStockRequestDto request) {
         Long userId = userSecurity.getCurrentUserId();
         log.info("REST request to add stock {} to watchlist: {}", request.getSymbol(), id);
-        Watchlist updated = watchlistServicePort.addStockToWatchlist(userId, id, request);
+        AddWatchlistStockCommand command = new AddWatchlistStockCommand(
+                request.getSymbol(),
+                request.getNotes(),
+                request.getTargetPrice(),
+                request.getStopLoss()
+        );
+        Watchlist updated = watchlistServicePort.addStockToWatchlist(userId, id, command);
         return ResponseEntity.ok(watchlistMapper.mapToDto(updated));
     }
 
@@ -116,9 +124,14 @@ public class WatchlistController {
             @PathVariable String symbol,
             @Valid @RequestBody WatchlistStockRequestDto request) {
         Long userId = userSecurity.getCurrentUserId();
-        request.setSymbol(symbol); // Ensure the URL symbol matches the request body
         log.info("REST request to update stock {} details in watchlist: {}", symbol, id);
-        Watchlist updated = watchlistServicePort.updateWatchlistStock(userId, id, request);
+        UpdateWatchlistStockCommand command = new UpdateWatchlistStockCommand(
+                symbol,
+                request.getNotes(),
+                request.getTargetPrice(),
+                request.getStopLoss()
+        );
+        Watchlist updated = watchlistServicePort.updateWatchlistStock(userId, id, command);
         return ResponseEntity.ok(watchlistMapper.mapToDto(updated));
     }
 }

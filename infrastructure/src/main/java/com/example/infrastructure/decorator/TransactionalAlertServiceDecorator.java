@@ -1,6 +1,7 @@
 package com.example.infrastructure.decorator;
 
-import com.example.application.dto.AlertRequestDto;
+import com.example.application.command.CreateAlertCommand;
+import com.example.application.command.UpdateAlertCommand;
 import com.example.application.port.in.AlertServicePort;
 import com.example.domain.model.Alert;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +18,8 @@ public class TransactionalAlertServiceDecorator implements AlertServicePort {
 
     @Override
     @Transactional
-    public Alert createAlert(Long userId, AlertRequestDto dto) {
-        return delegate.createAlert(userId, dto);
+    public Alert createAlert(Long userId, CreateAlertCommand command) {
+        return delegate.createAlert(userId, command);
     }
 
     @Override
@@ -35,8 +36,8 @@ public class TransactionalAlertServiceDecorator implements AlertServicePort {
 
     @Override
     @Transactional
-    public Alert updateAlert(Long userId, Long alertId, AlertRequestDto dto) {
-        return delegate.updateAlert(userId, alertId, dto);
+    public Alert updateAlert(Long userId, Long alertId, UpdateAlertCommand command) {
+        return delegate.updateAlert(userId, alertId, command);
     }
 
     @Override

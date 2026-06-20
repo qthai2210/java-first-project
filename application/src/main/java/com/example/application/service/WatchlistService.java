@@ -1,6 +1,7 @@
 package com.example.application.service;
 
-import com.example.application.dto.WatchlistStockRequestDto;
+import com.example.application.command.AddWatchlistStockCommand;
+import com.example.application.command.UpdateWatchlistStockCommand;
 import com.example.application.port.in.WatchlistServicePort;
 import com.example.application.port.out.StockPersistencePort;
 import com.example.application.port.out.UserPersistencePort;
@@ -71,17 +72,17 @@ public class WatchlistService implements WatchlistServicePort {
     }
 
     @Override
-    public Watchlist addStockToWatchlist(Long userId, Long watchlistId, WatchlistStockRequestDto dto) {
-        log.debug("Adding stock {} to watchlist: {}", dto.getSymbol(), watchlistId);
+    public Watchlist addStockToWatchlist(Long userId, Long watchlistId, AddWatchlistStockCommand command) {
+        log.debug("Adding stock {} to watchlist: {}", command.symbol(), watchlistId);
         Watchlist watchlist = getWatchlistById(userId, watchlistId);
-        Stock stock = stockPersistencePort.findBySymbol(dto.getSymbol().toUpperCase())
-                .orElseThrow(() -> new ResourceNotFoundException("Stock with symbol " + dto.getSymbol() + " not found"));
+        Stock stock = stockPersistencePort.findBySymbol(command.symbol().toUpperCase())
+                .orElseThrow(() -> new ResourceNotFoundException("Stock with symbol " + command.symbol() + " not found"));
 
         Watchlist updatedWatchlist = watchlist.addStock(
                 stock,
-                dto.getNotes(),
-                dto.getTargetPrice(),
-                dto.getStopLoss()
+                command.notes(),
+                command.targetPrice(),
+                command.stopLoss()
         );
 
         return watchlistPersistencePort.save(updatedWatchlist);
@@ -98,15 +99,15 @@ public class WatchlistService implements WatchlistServicePort {
     }
 
     @Override
-    public Watchlist updateWatchlistStock(Long userId, Long watchlistId, WatchlistStockRequestDto dto) {
-        log.debug("Updating stock {} details in watchlist: {}", dto.getSymbol(), watchlistId);
+    public Watchlist updateWatchlistStock(Long userId, Long watchlistId, UpdateWatchlistStockCommand command) {
+        log.debug("Updating stock {} details in watchlist: {}", command.symbol(), watchlistId);
         Watchlist watchlist = getWatchlistById(userId, watchlistId);
 
         Watchlist updatedWatchlist = watchlist.updateStock(
-                dto.getSymbol(),
-                dto.getNotes(),
-                dto.getTargetPrice(),
-                dto.getStopLoss()
+                command.symbol(),
+                command.notes(),
+                command.targetPrice(),
+                command.stopLoss()
         );
 
         return watchlistPersistencePort.save(updatedWatchlist);
