@@ -1,6 +1,6 @@
 package com.example.infrastructure.mapper;
 
-import com.example.application.dto.WatchlistRequestDto;
+import com.example.infrastructure.adapter.in.web.dto.WatchlistRequestDto;
 import com.example.application.dto.WatchlistResponseDto;
 import com.example.application.dto.WatchlistStockResponseDto;
 import com.example.domain.model.Watchlist;

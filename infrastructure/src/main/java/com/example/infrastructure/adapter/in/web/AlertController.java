@@ -2,7 +2,7 @@ package com.example.infrastructure.adapter.in.web;
 
 import com.example.application.command.CreateAlertCommand;
 import com.example.application.command.UpdateAlertCommand;
-import com.example.application.dto.AlertRequestDto;
+import com.example.infrastructure.adapter.in.web.dto.AlertRequestDto;
 import com.example.application.dto.AlertResponseDto;
 import com.example.application.port.in.AlertServicePort;
 import com.example.domain.model.Alert;

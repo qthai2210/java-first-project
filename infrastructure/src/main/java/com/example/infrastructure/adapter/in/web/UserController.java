@@ -1,6 +1,6 @@
 package com.example.infrastructure.adapter.in.web;
 
-import com.example.application.dto.UserRequestDto;
+import com.example.infrastructure.adapter.in.web.dto.UserRequestDto;
 import com.example.application.dto.UserResponseDto;
 import com.example.application.port.in.UserServicePort;
 import com.example.domain.model.User;

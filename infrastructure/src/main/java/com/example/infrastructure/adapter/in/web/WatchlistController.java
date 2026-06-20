@@ -2,9 +2,9 @@ package com.example.infrastructure.adapter.in.web;
 
 import com.example.application.command.AddWatchlistStockCommand;
 import com.example.application.command.UpdateWatchlistStockCommand;
-import com.example.application.dto.WatchlistRequestDto;
+import com.example.infrastructure.adapter.in.web.dto.WatchlistRequestDto;
 import com.example.application.dto.WatchlistResponseDto;
-import com.example.application.dto.WatchlistStockRequestDto;
+import com.example.infrastructure.adapter.in.web.dto.WatchlistStockRequestDto;
 import com.example.application.port.in.WatchlistServicePort;
 import com.example.domain.model.Watchlist;
 import com.example.infrastructure.mapper.WatchlistMapper;

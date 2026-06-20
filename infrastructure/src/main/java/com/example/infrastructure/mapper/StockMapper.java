@@ -1,6 +1,6 @@
 package com.example.infrastructure.mapper;
 
-import com.example.application.dto.StockRequestDto;
+import com.example.infrastructure.adapter.in.web.dto.StockRequestDto;
 import com.example.application.dto.StockResponseDto;
 import com.example.domain.model.Stock;
 import com.example.infrastructure.adapter.out.persistence.entity.StockJpaEntity;

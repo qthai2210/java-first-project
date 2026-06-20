@@ -1,8 +1,8 @@
 package com.example.infrastructure.decorator;
 
-import com.example.application.dto.AuthRequestDto;
+import com.example.application.command.LoginCommand;
+import com.example.application.command.RegisterUserCommand;
 import com.example.application.dto.AuthResponseDto;
-import com.example.application.dto.UserRequestDto;
 import com.example.application.port.in.AuthServicePort;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,14 +16,14 @@ public class TransactionalAuthServiceDecorator implements AuthServicePort {
 
     @Override
     @Transactional
-    public AuthResponseDto register(UserRequestDto request) {
-        return delegate.register(request);
+    public AuthResponseDto register(RegisterUserCommand command) {
+        return delegate.register(command);
     }
 
     @Override
     @Transactional
-    public AuthResponseDto login(AuthRequestDto request) {
-        return delegate.login(request);
+    public AuthResponseDto login(LoginCommand command) {
+        return delegate.login(command);
     }
 
     @Override

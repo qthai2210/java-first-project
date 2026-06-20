@@ -2,7 +2,7 @@ package com.example.infrastructure.adapter.in.web;
 
 import com.example.application.dto.PageDataDto;
 import com.example.application.dto.PageQueryDto;
-import com.example.application.dto.StockRequestDto;
+import com.example.infrastructure.adapter.in.web.dto.StockRequestDto;
 import com.example.application.dto.StockResponseDto;
 import com.example.application.port.in.StockServicePort;
 import com.example.domain.model.Stock;

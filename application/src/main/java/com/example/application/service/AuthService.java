@@ -1,8 +1,8 @@
 package com.example.application.service;
 
-import com.example.application.dto.AuthRequestDto;
+import com.example.application.command.LoginCommand;
+import com.example.application.command.RegisterUserCommand;
 import com.example.application.dto.AuthResponseDto;
-import com.example.application.dto.UserRequestDto;
 import com.example.application.port.in.AuthServicePort;
 import com.example.application.port.out.JwtServicePort;
 import com.example.application.port.out.PasswordEncoderPort;
@@ -42,16 +42,16 @@ public class AuthService implements AuthServicePort {
     }
 
     @Override
-    public AuthResponseDto register(UserRequestDto request) {
+    public AuthResponseDto register(RegisterUserCommand command) {
         // Business rule: email must be unique
-        if (userPersistencePort.existsByEmail(request.getEmail())) {
-            throw new DomainException("Email is already registered: " + request.getEmail());
+        if (userPersistencePort.existsByEmail(command.email())) {
+            throw new DomainException("Email is already registered: " + command.email());
         }
 
         User newUser = User.builder()
-                .name(request.getName())
-                .email(request.getEmail())
-                .password(passwordEncoderPort.encode(request.getPassword()))
+                .name(command.name())
+                .email(command.email())
+                .password(passwordEncoderPort.encode(command.password()))
                 .role(Role.USER)  // Default role is USER
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -67,11 +67,11 @@ public class AuthService implements AuthServicePort {
     }
 
     @Override
-    public AuthResponseDto login(AuthRequestDto request) {
-        User user = userPersistencePort.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + request.getEmail()));
+    public AuthResponseDto login(LoginCommand command) {
+        User user = userPersistencePort.findByEmail(command.email())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + command.email()));
 
-        if (!passwordEncoderPort.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordEncoderPort.matches(command.password(), user.getPassword())) {
             throw new DomainException("Invalid email or password");
         }
 
