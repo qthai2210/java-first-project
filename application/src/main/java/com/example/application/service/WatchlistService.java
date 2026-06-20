@@ -10,8 +10,6 @@ import com.example.domain.exception.ResourceNotFoundException;
 import com.example.domain.model.Stock;
 import com.example.domain.model.User;
 import com.example.domain.model.Watchlist;
-import com.example.domain.model.WatchlistStock;
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,7 +33,6 @@ public class WatchlistService implements WatchlistServicePort {
     }
 
     @Override
-    @Transactional
     public Watchlist createWatchlist(Long userId, Watchlist watchlist) {
         log.debug("Creating watchlist for user: {}, name: {}", userId, watchlist.getName());
         User user = userPersistencePort.findById(userId)
@@ -55,7 +52,6 @@ public class WatchlistService implements WatchlistServicePort {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Watchlist getWatchlistById(Long userId, Long watchlistId) {
         log.debug("Fetching watchlist: {} for user: {}", watchlistId, userId);
         Watchlist watchlist = watchlistPersistencePort.findById(watchlistId)
@@ -69,104 +65,54 @@ public class WatchlistService implements WatchlistServicePort {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Watchlist> getUserWatchlists(Long userId) {
         log.debug("Fetching all watchlists for user: {}", userId);
         return watchlistPersistencePort.findByUserId(userId);
     }
 
     @Override
-    @Transactional
     public Watchlist addStockToWatchlist(Long userId, Long watchlistId, WatchlistStockRequestDto dto) {
         log.debug("Adding stock {} to watchlist: {}", dto.getSymbol(), watchlistId);
         Watchlist watchlist = getWatchlistById(userId, watchlistId);
         Stock stock = stockPersistencePort.findBySymbol(dto.getSymbol().toUpperCase())
                 .orElseThrow(() -> new ResourceNotFoundException("Stock with symbol " + dto.getSymbol() + " not found"));
 
-        boolean alreadyExists = watchlist.getStocks().stream()
-                .anyMatch(ws -> ws.getStock().getSymbol().equalsIgnoreCase(dto.getSymbol()));
-
-        if (alreadyExists) {
-            throw new DomainException("Stock " + dto.getSymbol() + " is already in the watchlist");
-        }
-
-        WatchlistStock newStock = WatchlistStock.builder()
-                .stock(stock)
-                .addedAt(LocalDateTime.now())
-                .notes(dto.getNotes())
-                .targetPrice(dto.getTargetPrice())
-                .stopLoss(dto.getStopLoss())
-                .build();
-
-        List<WatchlistStock> updatedStocks = new ArrayList<>(watchlist.getStocks());
-        updatedStocks.add(newStock);
-
-        Watchlist updatedWatchlist = watchlist.toBuilder()
-                .stocks(updatedStocks)
-                .build();
+        Watchlist updatedWatchlist = watchlist.addStock(
+                stock,
+                dto.getNotes(),
+                dto.getTargetPrice(),
+                dto.getStopLoss()
+        );
 
         return watchlistPersistencePort.save(updatedWatchlist);
     }
 
     @Override
-    @Transactional
     public Watchlist removeStockFromWatchlist(Long userId, Long watchlistId, String symbol) {
         log.debug("Removing stock {} from watchlist: {}", symbol, watchlistId);
         Watchlist watchlist = getWatchlistById(userId, watchlistId);
 
-        boolean exists = watchlist.getStocks().stream()
-                .anyMatch(ws -> ws.getStock().getSymbol().equalsIgnoreCase(symbol));
-
-        if (!exists) {
-            throw new ResourceNotFoundException("Stock " + symbol + " not found in this watchlist");
-        }
-
-        List<WatchlistStock> updatedStocks = watchlist.getStocks().stream()
-                .filter(ws -> !ws.getStock().getSymbol().equalsIgnoreCase(symbol))
-                .toList();
-
-        Watchlist updatedWatchlist = watchlist.toBuilder()
-                .stocks(updatedStocks)
-                .build();
+        Watchlist updatedWatchlist = watchlist.removeStock(symbol);
 
         return watchlistPersistencePort.save(updatedWatchlist);
     }
 
     @Override
-    @Transactional
     public Watchlist updateWatchlistStock(Long userId, Long watchlistId, WatchlistStockRequestDto dto) {
         log.debug("Updating stock {} details in watchlist: {}", dto.getSymbol(), watchlistId);
         Watchlist watchlist = getWatchlistById(userId, watchlistId);
 
-        boolean exists = watchlist.getStocks().stream()
-                .anyMatch(ws -> ws.getStock().getSymbol().equalsIgnoreCase(dto.getSymbol()));
-
-        if (!exists) {
-            throw new ResourceNotFoundException("Stock " + dto.getSymbol() + " not found in this watchlist");
-        }
-
-        List<WatchlistStock> updatedStocks = watchlist.getStocks().stream()
-                .map(ws -> {
-                    if (ws.getStock().getSymbol().equalsIgnoreCase(dto.getSymbol())) {
-                        return ws.toBuilder()
-                                .notes(dto.getNotes())
-                                .targetPrice(dto.getTargetPrice())
-                                .stopLoss(dto.getStopLoss())
-                                .build();
-                    }
-                    return ws;
-                })
-                .toList();
-
-        Watchlist updatedWatchlist = watchlist.toBuilder()
-                .stocks(updatedStocks)
-                .build();
+        Watchlist updatedWatchlist = watchlist.updateStock(
+                dto.getSymbol(),
+                dto.getNotes(),
+                dto.getTargetPrice(),
+                dto.getStopLoss()
+        );
 
         return watchlistPersistencePort.save(updatedWatchlist);
     }
 
     @Override
-    @Transactional
     public void deleteWatchlist(Long userId, Long watchlistId) {
         log.debug("Deleting watchlist: {} for user: {}", watchlistId, userId);
         Watchlist watchlist = getWatchlistById(userId, watchlistId);

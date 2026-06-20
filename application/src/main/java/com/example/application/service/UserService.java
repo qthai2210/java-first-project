@@ -9,7 +9,6 @@ import com.example.domain.model.Role;
 import com.example.application.dto.PageDataDto;
 import com.example.application.dto.PageQueryDto;
 import com.example.domain.model.User;
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,7 +26,6 @@ public class UserService implements UserServicePort {
     }
 
     @Override
-    @Transactional
     public User createUser(User user) {
         log.debug("Creating user with email: {}", user.getEmail());
         if (userPersistencePort.existsByEmail(user.getEmail())) {
@@ -52,7 +50,6 @@ public class UserService implements UserServicePort {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public User getUserById(Long id) {
         log.debug("Fetching user by ID: {}", id);
         return userPersistencePort.findById(id)
@@ -63,7 +60,6 @@ public class UserService implements UserServicePort {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public User getUserByEmail(String email) {
         log.debug("Fetching user by email: {}", email);
         return userPersistencePort.findByEmail(email)
@@ -74,14 +70,12 @@ public class UserService implements UserServicePort {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public PageDataDto<User> getAllUsers(PageQueryDto query) {
         log.debug("Fetching all users list with page {} size {}", query.getPage(), query.getSize());
         return userPersistencePort.findAll(query);
     }
 
     @Override
-    @Transactional
     public User updateUser(Long id, User userDetails) {
         log.debug("Updating user details for ID: {}", id);
         User existingUser = getUserById(id);
@@ -110,7 +104,6 @@ public class UserService implements UserServicePort {
     }
 
     @Override
-    @Transactional
     public void deleteUser(Long id) {
         log.debug("Deleting user with ID: {}", id);
         if (!userPersistencePort.existsById(id)) {

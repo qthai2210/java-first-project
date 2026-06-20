@@ -7,7 +7,6 @@ import com.example.domain.exception.ResourceNotFoundException;
 import com.example.application.dto.PageDataDto;
 import com.example.application.dto.PageQueryDto;
 import com.example.domain.model.Stock;
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,7 +24,6 @@ public class StockService implements StockServicePort {
     }
 
     @Override
-    @Transactional
     public Stock createStock(Stock stock) {
         log.debug("Creating stock with symbol: {}", stock.getSymbol());
         if (stockPersistencePort.existsBySymbol(stock.getSymbol())) {
@@ -44,7 +42,7 @@ public class StockService implements StockServicePort {
     }
 
     @Override
-    @Transactional(readOnly = true)
+
     public Stock getStockById(Long id) {
         log.debug("Fetching stock by ID: {}", id);
         return stockPersistencePort.findById(id)
@@ -55,7 +53,7 @@ public class StockService implements StockServicePort {
     }
 
     @Override
-    @Transactional(readOnly = true)
+
     public Stock getStockBySymbol(String symbol) {
         log.debug("Fetching stock by symbol: {}", symbol);
         return stockPersistencePort.findBySymbol(symbol)
@@ -66,21 +64,20 @@ public class StockService implements StockServicePort {
     }
 
     @Override
-    @Transactional(readOnly = true)
+
     public PageDataDto<Stock> getAllStocks(PageQueryDto query) {
         log.debug("Fetching all stocks list with page {} size {}", query.getPage(), query.getSize());
         return stockPersistencePort.findAll(query);
     }
 
     @Override
-    @Transactional(readOnly = true)
+
     public List<Stock> searchStocks(String query) {
         log.debug("Searching stocks for query: {}", query);
         return stockPersistencePort.searchByQuery(query);
     }
 
     @Override
-    @Transactional
     public Stock updateStock(Long id, Stock stockDetails) {
         log.debug("Updating stock details for ID: {}", id);
         Stock existingStock = getStockById(id);
@@ -106,7 +103,6 @@ public class StockService implements StockServicePort {
     }
 
     @Override
-    @Transactional
     public void deleteStock(Long id) {
         log.debug("Deleting stock with ID: {}", id);
         Stock stock = getStockById(id);
@@ -116,7 +112,6 @@ public class StockService implements StockServicePort {
     }
 
     @Override
-    @Transactional
     public Stock updatePrice(String symbol, BigDecimal price) {
         log.debug("Updating price for stock {}: {}", symbol, price);
         Stock stock = getStockBySymbol(symbol);

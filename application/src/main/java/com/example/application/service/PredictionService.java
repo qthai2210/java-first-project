@@ -8,7 +8,6 @@ import com.example.application.dto.PageDataDto;
 import com.example.application.dto.PageQueryDto;
 import com.example.domain.model.Prediction;
 import com.example.domain.model.Stock;
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,7 +24,6 @@ public class PredictionService implements PredictionServicePort {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Prediction getLatestPrediction(String symbol) {
         log.debug("Fetching latest prediction for stock symbol: {}", symbol);
         Stock stock = stockPersistencePort.findBySymbol(symbol.toUpperCase())
@@ -36,7 +34,6 @@ public class PredictionService implements PredictionServicePort {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public PageDataDto<Prediction> getPredictions(String symbol, PageQueryDto query) {
         log.debug("Fetching all predictions list for stock symbol: {}", symbol);
         Stock stock = stockPersistencePort.findBySymbol(symbol.toUpperCase())
@@ -46,7 +43,7 @@ public class PredictionService implements PredictionServicePort {
     }
 
     @Override
-    @Transactional
+
     public Prediction generatePrediction(String symbol) {
         // TODO: Integrate with external Python ML Prediction service in Phase 7
         throw new UnsupportedOperationException("ML Prediction generation is not supported yet for symbol: " + symbol);

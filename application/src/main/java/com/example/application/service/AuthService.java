@@ -13,7 +13,6 @@ import com.example.domain.exception.ResourceNotFoundException;
 import com.example.domain.model.RefreshToken;
 import com.example.domain.model.Role;
 import com.example.domain.model.User;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -43,7 +42,6 @@ public class AuthService implements AuthServicePort {
     }
 
     @Override
-    @Transactional
     public AuthResponseDto register(UserRequestDto request) {
         // Business rule: email must be unique
         if (userPersistencePort.existsByEmail(request.getEmail())) {
@@ -69,7 +67,6 @@ public class AuthService implements AuthServicePort {
     }
 
     @Override
-    @Transactional
     public AuthResponseDto login(AuthRequestDto request) {
         User user = userPersistencePort.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + request.getEmail()));
@@ -91,7 +88,6 @@ public class AuthService implements AuthServicePort {
     }
 
     @Override
-    @Transactional
     public AuthResponseDto refreshToken(String tokenStr) {
         RefreshToken refreshToken = refreshTokenPersistencePort.findByToken(tokenStr)
                 .orElseThrow(() -> new ResourceNotFoundException("Refresh token not found"));

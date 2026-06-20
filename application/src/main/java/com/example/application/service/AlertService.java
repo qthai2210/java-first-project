@@ -12,7 +12,6 @@ import com.example.domain.model.AlertConditionType;
 import com.example.domain.model.ComparisonOperator;
 import com.example.domain.model.Stock;
 import com.example.domain.model.User;
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,7 +34,7 @@ public class AlertService implements AlertServicePort {
     }
 
     @Override
-    @Transactional
+
     public Alert createAlert(Long userId, AlertRequestDto dto) {
         log.debug("Creating alert for user ID: {} on stock: {}", userId, dto.getSymbol());
         User user = userPersistencePort.findById(userId)
@@ -67,14 +66,12 @@ public class AlertService implements AlertServicePort {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Alert> getUserAlerts(Long userId) {
         log.debug("Fetching all alerts for user ID: {}", userId);
         return alertPersistencePort.findByUserId(userId);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Alert getAlertById(Long userId, Long alertId) {
         log.debug("Fetching alert: {} for user: {}", alertId, userId);
         Alert alert = alertPersistencePort.findById(alertId)
@@ -88,7 +85,7 @@ public class AlertService implements AlertServicePort {
     }
 
     @Override
-    @Transactional
+
     public Alert updateAlert(Long userId, Long alertId, AlertRequestDto dto) {
         log.debug("Updating alert ID: {}", alertId);
         Alert alert = getAlertById(userId, alertId);
@@ -112,7 +109,7 @@ public class AlertService implements AlertServicePort {
     }
 
     @Override
-    @Transactional
+
     public void toggleAlert(Long userId, Long alertId, boolean enabled) {
         log.debug("Toggling alert ID: {} to enabled: {}", alertId, enabled);
         Alert alert = getAlertById(userId, alertId);
@@ -121,7 +118,7 @@ public class AlertService implements AlertServicePort {
     }
 
     @Override
-    @Transactional
+
     public void deleteAlert(Long userId, Long alertId) {
         log.debug("Deleting alert ID: {} for user: {}", alertId, userId);
         Alert alert = getAlertById(userId, alertId);
@@ -129,7 +126,7 @@ public class AlertService implements AlertServicePort {
     }
 
     @Override
-    @Transactional
+
     public void checkAlerts() {
         // Defer alert execution and market rule processing to Phase 7
         log.info("Alert evaluation execution triggered (Staged/Deferred for Phase 7 scheduler).");

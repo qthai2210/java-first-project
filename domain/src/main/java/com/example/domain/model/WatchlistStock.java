@@ -20,4 +20,18 @@ public class WatchlistStock {
     private String notes;
     private BigDecimal targetPrice;
     private BigDecimal stopLoss;
+
+    public boolean hasSymbol(String symbol) {
+        return stock != null
+                && stock.getSymbol() != null
+                && stock.getSymbol().equalsIgnoreCase(symbol);
+    }
+
+    public WatchlistStock updateTracking(String notes, BigDecimal targetPrice, BigDecimal stopLoss) {
+        return toBuilder()
+                .notes(notes)
+                .targetPrice(targetPrice)
+                .stopLoss(stopLoss)
+                .build();
+    }
 }
